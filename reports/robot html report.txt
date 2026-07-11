@@ -1,0 +1,1 @@
+we use robot framework html logs in playwright pytest

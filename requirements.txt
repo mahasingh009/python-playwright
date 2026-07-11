@@ -1,0 +1,5 @@
+pytest-playwright
+pytest-xdist
+Faker
+pytest_robotframework
+

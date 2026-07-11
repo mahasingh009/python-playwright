@@ -1,0 +1,16 @@
+{
+  "register_users": {
+    "obj_firstnameEdit": "//span[@id='ctl00_CPPC_wzrdRegistration_rvFirstName']/preceding-sibling::*",
+    "obj_lastnameEdit": "//span[@id='ctl00_CPPC_wzrdRegistration_rvLastName']/preceding-sibling::*",
+    "obj_contactEmail": "//span[@id='ctl00_CPPC_wzrdRegistration_rvEmail']/preceding-sibling::*",
+	"obj_retypecontactEmail": "//span[@id='ctl00_CPPC_wzrdRegistration_rvEmailRetype']/preceding-sibling::*",
+	"obj_username": "//span[@id='ctl00_CPPC_wzrdRegistration_rvUserName']/preceding-sibling::*",
+	"obj_createpass": "//span[@id='ctl00_CPPC_wzrdRegistration_rvPassword']/preceding-sibling::*",
+	"obj_retypepass": "//span[@id='ctl00_CPPC_wzrdRegistration_rvRetype']/preceding-sibling::*"
+  },
+  "landing_page": {
+    "obj_register_link": "//span[text()='Register']",
+    "obj_ship_online_link": "//span[text()='Ship Online']/parent::a",
+    "obj_open_puro_account": "//span[text()='Open a Purolator Business Account']/preceding-sibling::*"
+  }
+}
