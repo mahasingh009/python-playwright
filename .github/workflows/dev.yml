@@ -1,4 +1,4 @@
-name: DEV Playwright firefox Tests
+name: DEV Playwright firefox 
 on:
   workflow_dispatch:
 
