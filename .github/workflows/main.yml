@@ -1,12 +1,12 @@
-name: UAT Playwright chromium 
+name: UAT Playwright chromium
 on:
   workflow_dispatch:
 
 jobs:
-  playwright-tests:
-    timeout-minutes: 60
+  # Stage 1: Prepare Environment
+  setup-environment:
+    timeout-minutes: 15
     runs-on: windows-latest
-    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,6 +21,20 @@ jobs:
       with:
         node-version: '24'
 
+  # Stage 2: Run the Tests (Depends on Setup finishing)
+  run-tests:
+    timeout-minutes: 45
+    runs-on: windows-latest
+    needs: setup-environment # <--- This creates the visual connection
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.14'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -31,9 +45,17 @@ jobs:
       run: |
         pytest --robot-outputdir reports --headed --browser chromium  tests/ -s -v --target-env config/uat_config.json
 
+  # Stage 3: Publish Results (Depends on Tests finishing, even if they fail)
+  publish-results:
+    runs-on: windows-latest
+    needs: run-tests # <--- This creates the next visual connection
+    if: always()     # Ensures reports upload even if tests fail
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Upload test artifacts
       uses: actions/upload-artifact@v4
-      if: success() || failure()
       with:
         name: playwright-results       
         path: reports/
