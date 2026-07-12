@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Stage 1: Prepare Environment
+  # Stage 1: Install and Cache Everything
   setup-environment:
     timeout-minutes: 15
     runs-on: windows-latest
@@ -15,17 +15,33 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.14'
+        cache: 'pip' # Automatically caches pip dependencies
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '24'
 
-  # Stage 2: Run the Tests (Depends on Setup finishing)
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Cache the Playwright browsers so they don't re-download in the next job
+    - name: Cache Playwright Browsers
+      uses: actions/cache@v4
+      with:
+        path: ~\AppData\Local\ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/requirements.txt') }}
+
+    - name: Install Playwright Browsers
+      run: playwright install firefox
+
+  # Stage 2: Run the Tests (Fast because it pulls from Cache)
   run-tests:
     timeout-minutes: 45
     runs-on: windows-latest
-    needs: setup-environment # <--- This creates the visual connection
+    needs: setup-environment
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -34,22 +50,23 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.14'
+        cache: 'pip' # Restores cached pip dependencies instantly
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        playwright install
+    - name: Restore Playwright Browsers
+      uses: actions/cache@v4
+      with:
+        path: ~\AppData\Local\ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/requirements.txt') }}
 
     - name: Run your tests
       run: |
         pytest --robot-outputdir reports --headed --browser firefox  tests/ -s -v --target-env config/uat_config.json
 
-  # Stage 3: Publish Results (Depends on Tests finishing, even if they fail)
+  # Stage 3: Publish Results
   publish-results:
     runs-on: windows-latest
-    needs: run-tests # <--- This creates the next visual connection
-    if: always()     # Ensures reports upload even if tests fail
+    needs: run-tests
+    if: always()
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
