@@ -1,4 +1,4 @@
-name: UAT Playwright chromium Tests
+name: UAT Playwright chromium 
 on:
   workflow_dispatch:
 
