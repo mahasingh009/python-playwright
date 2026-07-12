@@ -1,4 +1,4 @@
-name: SIT Playwright chromium Tests
+name: SIT Playwright chromium 
 on:
   workflow_dispatch:
 
